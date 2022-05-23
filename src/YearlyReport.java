@@ -1,102 +1,78 @@
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 public class YearlyReport {
     private final HashMap<Integer, Double> expenses;
-    private final HashMap<Integer, Double> income;
+    private final HashMap<Integer, Double> incomes;
 
     public YearlyReport() {
         expenses = new HashMap<>();
-        income = new HashMap<>();
+        incomes = new HashMap<>();
     }
 
-    public void addReportItem(int monthNumber, boolean isExpense, Double value) {
+    public void addReportEntry(int monthNumber, boolean isExpense, Double value) {
+        HashMap<Integer, Double> items;
         if (isExpense) {
-            if (expenses.containsKey(monthNumber)) {
-                double expenseValue = expenses.get(monthNumber);
-                expenses.remove(monthNumber);
-                expenseValue += value;
-                expenses.put(monthNumber, expenseValue);
-            } else {
-                expenses.put(monthNumber, value);
-            }
+            items = expenses;
         } else {
-            if (income.containsKey(monthNumber)) {
-                double expenseValue = income.get(monthNumber);
-                income.remove(monthNumber);
-                expenseValue += value;
-                income.put(monthNumber, expenseValue);
-            } else {
-                income.put(monthNumber, value);
-            }
+            items = incomes;
+        }
+        if (items.containsKey(monthNumber)) {
+            double itemValue = items.get(monthNumber);
+            items.remove(monthNumber);
+            itemValue += value;
+            items.put(monthNumber, itemValue);
+        } else {
+            items.put(monthNumber, value);
         }
     }
 
-    public double getExpensesByMonth(int monthNumber) {
+    public double getExpenseForMonth(int monthNumber) {
         return expenses.get(monthNumber);
     }
 
-    public double getIncomeByMonth(int monthNumber) {
-        return income.get(monthNumber);
+    public double getIncomeForMonth(int monthNumber) {
+        return incomes.get(monthNumber);
     }
 
-    public double getAverageExpenses() {
-        return getAverageValue(true);
+    public double getAvgExpense() {
+        return getAvgForHashMapValues(true);
     }
 
-    public double getAverageIncomes() {
+    public double getAvgIncome() {
 
-        return getAverageValue(false);
+        return getAvgForHashMapValues(false);
     }
 
-    private double getAverageValue(boolean isForExpenses)
-    {
-        Collection<Double> itemValues;
-        if (isForExpenses && !expenses.isEmpty()) {
-            itemValues =  expenses.values();
-        }
-        else if  (!isForExpenses && !income.isEmpty())
-        {
-            itemValues = income.values();
-        }
-        else
-        {
-            return -1;
-        }
-
-            double sum = 0;
-            for (var value : itemValues) {
-                sum += value;
-            }
-            return sum / itemValues.size();
-
-    }
-
-    public ArrayList<Double> getBalancesPerMonth()
-    {
+    public ArrayList<Double> getBalancePerMonths() {
         ArrayList<Double> result = new ArrayList<>();
-       int counter = Integer.max(expenses.size(), income.size());
+        int counter = Integer.max(expenses.size(), incomes.size());
         for (int i = 0; i <= counter; i++) {
-            if (expenses.containsKey(i) && income.containsKey(i))
-            {
-                result.add(income.get(i)-expenses.get(i));
-            }
-            else if (expenses.containsKey(i) && !income.containsKey(i))
-            {
+            if (expenses.containsKey(i) && incomes.containsKey(i)) {
+                result.add(incomes.get(i) - expenses.get(i));
+            } else if (expenses.containsKey(i) && !incomes.containsKey(i)) {
                 result.add(-expenses.get(i));
-            }
-            else if (!expenses.containsKey(i) && income.containsKey(i))
-            {
-                result.add(income.get(i));
+            } else if (!expenses.containsKey(i) && incomes.containsKey(i)) {
+                result.add(incomes.get(i));
             }
         }
         return result;
     }
+
+    private double getAvgForHashMapValues(boolean isForExpenses) {
+        Collection<Double> itemValues;
+        if (isForExpenses && !expenses.isEmpty()) {
+            itemValues = expenses.values();
+        } else if (!isForExpenses && !incomes.isEmpty()) {
+            itemValues = incomes.values();
+        } else {
+            return -1;
+        }
+        double sum = 0;
+        for (var value : itemValues) {
+            sum += value;
+        }
+        return sum / itemValues.size();
+    }
 }
-
-
-
-
-

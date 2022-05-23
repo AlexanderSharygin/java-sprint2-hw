@@ -1,40 +1,32 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class MonthlyReport {
     private int MonthNumber;
-    private HashMap<String, Double> expenses;
-    private HashMap<String, Double> income;
+    private final HashMap<String, Double> expenses;
+    private final HashMap<String, Double> incomes;
 
-    public MonthlyReport()
-    {
-        MonthNumber=-1;
+    public MonthlyReport() {
+        MonthNumber = -1;
         expenses = new HashMap<>();
-        income = new HashMap<>();
+        incomes = new HashMap<>();
     }
 
-    public void addReportItem(int monthNumber, String name, boolean isExpense, Double value) {
+    public void addReportEntry(int monthNumber, String name, boolean isExpense, Double value) {
+        HashMap<String, Double> items;
         if (isExpense) {
-            if (expenses.containsKey(name)) {
-                double expenseValue = expenses.get(name);
-                expenses.remove(name);
-                expenseValue += value;
-                expenses.put(name, expenseValue);
-            } else {
-                expenses.put(name, value);
-                this.MonthNumber=monthNumber;
-            }
+            items = expenses;
         } else {
-            if (income.containsKey(name)) {
-                double incomeValue = expenses.get(name);
-                expenses.remove(name);
-                incomeValue += value;
-                expenses.put(name, incomeValue);
-            } else {
-                income.put(name, value);
-                this.MonthNumber=monthNumber;
-            }
+            items = incomes;
+        }
+        if (items.containsKey(name)) {
+            double itemValue = items.get(name);
+            items.remove(name);
+            itemValue += value;
+            items.put(name, itemValue);
+        } else {
+            items.put(name, value);
+            this.MonthNumber = monthNumber;
         }
     }
 
@@ -42,14 +34,63 @@ public class MonthlyReport {
         return MonthNumber;
     }
 
-    public  HashMap<String, Double> getExpenses()
-    {
-        return  expenses;
+    public ArrayList<String> getMaxExpenseData() {
+        return geMaxForHashMapValues(true);
     }
 
-    public  HashMap<String, Double> getIncome()
-    {
-        return  income;
+    public ArrayList<String> getMaxIncomeData() {
+        return geMaxForHashMapValues(false);
     }
 
+    public double getExpensesSum() {
+        return getHasMapValuesSum(true);
+    }
+
+    public double getIncomesSum() {
+        return getHasMapValuesSum(false);
+    }
+
+    private ArrayList<String> geMaxForHashMapValues(boolean isExpense) {
+        HashMap<String, Double> items = new HashMap<>();
+        ArrayList<String> result = new ArrayList<>();
+        if (isExpense && !expenses.isEmpty()) {
+            items = this.expenses;
+        } else if (!isExpense && !incomes.isEmpty()) {
+            items = this.incomes;
+        } else {
+            if (isExpense) {
+                result.add("В этом месяце нет затрат");
+            } else {
+                result.add("В этом месяце нет прибыли");
+            }
+        }
+        String maxItemName = "";
+        Double maxItemValue = 0.0;
+        if (!items.isEmpty()) {
+            for (var key : items.keySet()) {
+                if (items.get(key) > maxItemValue) {
+                    maxItemValue = items.get(key);
+                    maxItemName = key;
+                }
+            }
+            result.add(maxItemName);
+            result.add(String.valueOf(maxItemValue));
+        }
+        return result;
+    }
+
+    private double getHasMapValuesSum(boolean isExpense) {
+        HashMap<String, Double> items = new HashMap<>();
+        if (isExpense && !expenses.isEmpty()) {
+            items = this.expenses;
+        } else {
+            items = this.incomes;
+        }
+        double sum = 0;
+        for (var key : items.keySet()) {
+            Double value = items.get(key);
+            sum += value;
+        }
+        return sum;
+    }
 }
