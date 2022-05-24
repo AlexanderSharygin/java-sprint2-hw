@@ -37,12 +37,12 @@ public class YearlyReport {
     }
 
     public double getAvgExpense() {
-        return getAvgForHashMapValues(true);
+        return getFinancialDataAvgValue(true);
     }
 
     public double getAvgIncome() {
 
-        return getAvgForHashMapValues(false);
+        return getFinancialDataAvgValue(false);
     }
 
     public ArrayList<Double> getBalancePerMonths() {
@@ -60,7 +60,7 @@ public class YearlyReport {
         return result;
     }
 
-    private double getAvgForHashMapValues(boolean isForExpenses) {
+    private double getFinancialDataAvgValue(boolean isForExpenses) {
         Collection<Double> itemValues;
         if (isForExpenses && !expenses.isEmpty()) {
             itemValues = expenses.values();

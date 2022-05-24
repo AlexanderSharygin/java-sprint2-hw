@@ -2,12 +2,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MonthlyReport {
-    private int MonthNumber;
+    private int monthNumber;
     private final HashMap<String, Double> expenses;
     private final HashMap<String, Double> incomes;
 
     public MonthlyReport() {
-        MonthNumber = -1;
+        monthNumber = -1;
         expenses = new HashMap<>();
         incomes = new HashMap<>();
     }
@@ -26,20 +26,20 @@ public class MonthlyReport {
             items.put(name, itemValue);
         } else {
             items.put(name, value);
-            this.MonthNumber = monthNumber;
+            this.monthNumber = monthNumber;
         }
     }
 
     public int getMonthNumber() {
-        return MonthNumber;
+        return monthNumber;
     }
 
     public ArrayList<String> getMaxExpenseData() {
-        return geMaxForHashMapValues(true);
+        return getFinancialDataMaxValue(true);
     }
 
     public ArrayList<String> getMaxIncomeData() {
-        return geMaxForHashMapValues(false);
+        return getFinancialDataMaxValue(false);
     }
 
     public double getExpensesSum() {
@@ -50,7 +50,7 @@ public class MonthlyReport {
         return getHasMapValuesSum(false);
     }
 
-    private ArrayList<String> geMaxForHashMapValues(boolean isExpense) {
+    private ArrayList<String> getFinancialDataMaxValue(boolean isExpense) {
         HashMap<String, Double> items = new HashMap<>();
         ArrayList<String> result = new ArrayList<>();
         if (isExpense && !expenses.isEmpty()) {
@@ -80,7 +80,7 @@ public class MonthlyReport {
     }
 
     private double getHasMapValuesSum(boolean isExpense) {
-        HashMap<String, Double> items = new HashMap<>();
+        HashMap<String, Double> items;
         if (isExpense && !expenses.isEmpty()) {
             items = this.expenses;
         } else {

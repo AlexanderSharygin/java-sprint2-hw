@@ -1,20 +1,33 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         ReportManager reportManager = new ReportManager();
-        final String reportFilesPath = "resources/";
+        final String reportFilesPath = "resources\\";
+        DataReader dataReader = new DataReader(reportFilesPath);
+        var a = System.getProperties();
         final String yearNumber = "2021";
         Scanner scanner = new Scanner(System.in);
         while (true) {
             printMenu();
             reportManager.clearErrorsLog();
-            String command = scanner.nextLine();
+            String command = scanner.nextLine().replaceAll("\\s", "");
             if (command.equals("1")) {
-                reportManager.readMonthlyReports(reportFilesPath, yearNumber);
+                try {
+                    ArrayList <String> monthlyReportsFileBody = dataReader.readMonthlyReportFiles(yearNumber);
+                    reportManager.parseMonthlyReports(monthlyReportsFileBody);
+                } catch (MissedReportException e) {
+                    System.out.println(e.getMessage());
+                }
             } else if (command.equals("2")) {
-                reportManager.readYearlyReport(reportFilesPath, yearNumber);
+                try {
+                    String yearlyReportFileBody = dataReader.readYearlyReportFile(yearNumber);
+                    reportManager.parseYearlyReport(yearlyReportFileBody);
+                } catch (MissedReportException e) {
+                    System.out.println(e.getMessage());
+                }
             } else if (command.equals("3")) {
                 List<String> errors = reportManager.compareReports();
                 printLog(errors);

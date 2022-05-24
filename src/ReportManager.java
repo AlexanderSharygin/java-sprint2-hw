@@ -12,18 +12,12 @@ public class ReportManager {
     YearlyReport yearlyReport;
     ArrayList<String> log = new ArrayList<>();
 
-    public void readMonthlyReports(String path, String yearNumber) {
+    public void parseMonthlyReports(ArrayList<String> reportFilesText) {
         monthlyReports = new MonthlyReport[12];
-        for (int i = 1; i <= 12; i++) {
-            MonthlyReport monthlyReport = new MonthlyReport();
-            String monthNumber = String.valueOf(i);
-            if (i < 10) {
-                monthNumber = "0" + monthNumber;
-            }
-            String reportFileBody = readFileContentsOrNull(path + "m." + yearNumber + monthNumber + ".csv",
-                    true, i);
-            if (reportFileBody != null) {
-                String[] reportRows = reportFileBody.split(System.lineSeparator());
+        for (int i = 0; i < reportFilesText.size(); i++) {
+            {
+                MonthlyReport monthlyReport = new MonthlyReport();
+                String[] reportRows = reportFilesText.get(i).split(System.lineSeparator());
                 for (int j = 1; j < reportRows.length; j++) {
                     String[] rowCells = reportRows[j].split(",");
                     String name = rowCells[0];
@@ -32,25 +26,25 @@ public class ReportManager {
                     if (rowCells[1].toLowerCase(Locale.ROOT).equals("true")) {
                         isExpense = true;
                     }
-                    monthlyReport.addReportEntry(i, name, isExpense, value);
-                    monthlyReports[i - 1] = monthlyReport;
+                    monthlyReport.addReportEntry(i + 1, name, isExpense, value);
+
                 }
+                monthlyReports[i] = monthlyReport;
+
             }
         }
     }
 
-    public void readYearlyReport(String path, String yearNumber) {
+    public void parseYearlyReport(String reportFileBody) {
         yearlyReport = new YearlyReport();
-        String reportFileBody = readFileContentsOrNull(path + "y." + yearNumber + ".csv", false, null);
-        if (reportFileBody != null) {
-            String[] reportRows = reportFileBody.split(System.lineSeparator());
-            for (int i = 1; i < reportRows.length; i++) {
-                String[] rowCells = reportRows[i].split(",");
-                int monthNumber = Integer.parseInt(rowCells[0]);
-                boolean isExpense = rowCells[2].toLowerCase(Locale.ROOT).equals("true");
-                double value = Double.parseDouble(rowCells[1]);
-                yearlyReport.addReportEntry(monthNumber, isExpense, value);
-            }
+        String[] reportRows = reportFileBody.split(System.lineSeparator());
+        for (int i = 1; i < reportRows.length; i++) {
+            String[] rowCells = reportRows[i].split(",");
+            int monthNumber = Integer.parseInt(rowCells[0]);
+            boolean isExpense = rowCells[2].toLowerCase(Locale.ROOT).equals("true");
+            double value = Double.parseDouble(rowCells[1]);
+            yearlyReport.addReportEntry(monthNumber, isExpense, value);
+
         }
     }
 
