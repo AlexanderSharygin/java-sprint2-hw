@@ -11,26 +11,25 @@ public class DataReader {
         this.pathToFiles = pathToFiles;
     }
 
-    public String readYearlyReportFile(String yearNumber) {
+    public String getYearlyReportText(String yearNumber) {
         return readFileContentsOrNull("y." + yearNumber + ".csv", false, null);
     }
 
-    public ArrayList<String> readMonthlyReportFiles(String yearNumber) {
-            ArrayList<String> result = new ArrayList<>();
-            for (int i = 1; i <= 12; i++) {
-                String monthNumber = String.valueOf(i);
-                if (i < 10) {
-                    monthNumber = "0" + monthNumber;
-                }
-                String reportFileBody = readFileContentsOrNull("m." + yearNumber + monthNumber + ".csv",
-                        true, i);
-                if (reportFileBody != null) {
-                    result.add(reportFileBody);
-                }
+    public ArrayList<String> getMonthlyReportsText(String yearNumber) {
+        ArrayList<String> result = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            String monthNumber = String.valueOf(i);
+            if (i < 10) {
+                monthNumber = "0" + monthNumber;
             }
-            return result;
+            String reportFileBody = readFileContentsOrNull("m." + yearNumber + monthNumber + ".csv",
+                    true, i);
+            if (reportFileBody != null) {
+                result.add(reportFileBody);
+            }
+        }
+        return result;
     }
-
 
     private String readFileContentsOrNull(String fileName, boolean isMonthlyReport, Integer monthNumber) {
         try {
@@ -40,9 +39,9 @@ public class DataReader {
 
         } catch (Exception e) {
             if (isMonthlyReport) {
-                throw new MissedReportException("Ошибка при загрузке месячного отчёта за месяц " + monthNumber + "!");
+                throw new ReadMonthlyReportException("Ошибка при загрузке месячных отчётов");
             } else {
-                throw new MissedReportException("Ошибка при загрузке годового отчёта!");
+                throw new ReadYearlyReportException("Ошибка при загрузке годового отчёта!");
             }
         }
     }

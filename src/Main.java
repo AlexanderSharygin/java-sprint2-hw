@@ -1,65 +1,46 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        ReportManager reportManager = new ReportManager();
         final String reportFilesPath = "resources\\";
+        ConsoleUI consoleUI = new ConsoleUI();
+        ReportManager reportManager = new ReportManager();
         DataReader dataReader = new DataReader(reportFilesPath);
-        var a = System.getProperties();
         final String yearNumber = "2021";
-        Scanner scanner = new Scanner(System.in);
         while (true) {
-            printMenu();
+            consoleUI.printMenu();
             reportManager.clearErrorsLog();
-            String command = scanner.nextLine().replaceAll("\\s", "");
+            String command = consoleUI.getCommand();
             if (command.equals("1")) {
                 try {
-                    ArrayList <String> monthlyReportsFileBody = dataReader.readMonthlyReportFiles(yearNumber);
+                    ArrayList<String> monthlyReportsFileBody = dataReader.getMonthlyReportsText(yearNumber);
                     reportManager.parseMonthlyReports(monthlyReportsFileBody);
-                } catch (MissedReportException e) {
-                    System.out.println(e.getMessage());
+                } catch (ReadMonthlyReportException e) {
+                    consoleUI.printMonthlyReportErrorMessage();
                 }
             } else if (command.equals("2")) {
                 try {
-                    String yearlyReportFileBody = dataReader.readYearlyReportFile(yearNumber);
+                    String yearlyReportFileBody = dataReader.getYearlyReportText(yearNumber);
                     reportManager.parseYearlyReport(yearlyReportFileBody);
-                } catch (MissedReportException e) {
-                    System.out.println(e.getMessage());
+                } catch (ReadYearlyReportException e) {
+                    consoleUI.printYearlyReportErrorMessage();
                 }
             } else if (command.equals("3")) {
                 List<String> errors = reportManager.compareReports();
-                printLog(errors);
+                consoleUI.printLog(errors);
             } else if (command.equals("4")) {
                 List<String> result = reportManager.getMonthlyReportsInfo();
-                printLog(result);
+                consoleUI.printLog(result);
             } else if (command.equals("5")) {
                 List<String> result = reportManager.getYearlyReportsInfo(yearNumber);
-                printLog(result);
+                consoleUI.printLog(result);
             } else if (command.equals("exit")) {
-                System.out.println("Программа завершена.");
-                scanner.close();
+                consoleUI.printExitMessage();
+                consoleUI.close();
                 break;
             } else {
-                System.out.println("Извините, такой команды пока нет.");
-            }
-        }
-    }
-
-    public static void printMenu() {
-        System.out.println("Что вы хотите сделать (для выхода введите 'exit' и нажмите Enter)? ");
-        System.out.println("1 - Считать все месячные отчёты");
-        System.out.println("2 - Считать годовой отчёт");
-        System.out.println("3 - Сверить отчёты");
-        System.out.println("4 - Вывести информацию о всех месячных отчётах");
-        System.out.println("5 - Вывести информацию о годовом отчёте");
-    }
-
-    public static void printLog(List<String> errorsList) {
-        if (!errorsList.isEmpty()) {
-            for (String error : errorsList) {
-                System.out.println(error);
+                consoleUI.printNoExistCommandMessage();
             }
         }
     }

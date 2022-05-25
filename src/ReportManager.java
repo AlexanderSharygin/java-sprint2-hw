@@ -1,6 +1,3 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -10,7 +7,11 @@ import java.util.Locale;
 public class ReportManager {
     MonthlyReport[] monthlyReports;
     YearlyReport yearlyReport;
-    ArrayList<String> log = new ArrayList<>();
+    ArrayList<String> log;
+
+    public ReportManager() {
+        log = new ArrayList<>();
+    }
 
     public void parseMonthlyReports(ArrayList<String> reportFilesText) {
         monthlyReports = new MonthlyReport[12];
@@ -27,10 +28,8 @@ public class ReportManager {
                         isExpense = true;
                     }
                     monthlyReport.addReportEntry(i + 1, name, isExpense, value);
-
                 }
                 monthlyReports[i] = monthlyReport;
-
             }
         }
     }
@@ -44,12 +43,11 @@ public class ReportManager {
             boolean isExpense = rowCells[2].toLowerCase(Locale.ROOT).equals("true");
             double value = Double.parseDouble(rowCells[1]);
             yearlyReport.addReportEntry(monthNumber, isExpense, value);
-
         }
     }
 
     public ArrayList<String> compareReports() {
-        if (isReportsAreNotExist(true, true)) {
+        if (isYearlyReportsNotExist() & isMonthlyReportsAreNotExist()) {
             return log;
         }
         boolean isReportsCorrect = true;
@@ -80,7 +78,7 @@ public class ReportManager {
     }
 
     public ArrayList<String> getYearlyReportsInfo(String yearNumber) {
-        if (isReportsAreNotExist(false, true)) {
+        if (isYearlyReportsNotExist()) {
             return log;
         }
         log.add(("Отчёт за " + yearNumber + " год.").toUpperCase());
@@ -108,7 +106,7 @@ public class ReportManager {
     }
 
     public ArrayList<String> getMonthlyReportsInfo() {
-        if (isReportsAreNotExist(true, false)) {
+        if (isMonthlyReportsAreNotExist()) {
             return log;
         }
         for (MonthlyReport monthlyReport : monthlyReports) {
@@ -139,29 +137,18 @@ public class ReportManager {
         log.clear();
     }
 
-    private String readFileContentsOrNull(String path, boolean isMonthlyReport, Integer monthNumber) {
-        try {
-            return Files.readString(Path.of(path));
-
-        } catch (IOException e) {
-            return null;
-        } catch (Exception e) {
-            if (isMonthlyReport) {
-                log.add("Ошибка при загрузке месячного отчёта за месяц " + monthNumber + "!");
-            } else {
-                log.add("Ошибка при загрузке годового отчёта!");
-            }
-            return null;
-        }
-    }
-
-    private boolean isReportsAreNotExist(boolean checkMonthlyReports, boolean checkYearlyReport) {
+    private boolean isYearlyReportsNotExist() {
         boolean result = true;
-        if (checkYearlyReport && yearlyReport == null) {
+        if (yearlyReport == null) {
             log.add("Годоввой отчёт не загружен!");
             result = false;
         }
-        if (checkMonthlyReports && monthlyReports == null) {
+        return !result;
+    }
+
+    private boolean isMonthlyReportsAreNotExist() {
+        boolean result = true;
+        if (monthlyReports == null) {
             log.add("Не загружено ни одного отчёта за месяц!");
             result = false;
         }
